@@ -2,6 +2,10 @@
 
 รันด้วย:  uvicorn app:app --reload --port 8000
 ข้อมูลเก็บในไฟล์ SQLite ชื่อ links.db ในโฟลเดอร์ที่รันคำสั่ง
+
+TODO (lab บทที่ 2): ไฟล์นี้คือ solution ของบทที่ 1 ที่ทุกอย่างรวมอยู่ในไฟล์เดียว
+  ย้ายโค้ดไปแยกชั้นในโฟลเดอร์ app/ (ดู app/README.md) แล้วลบไฟล์นี้ทิ้ง
+  จุดที่ต้องเปลี่ยน: DB_PATH, short_url ที่ใช้ request.base_url, และ /healthz ที่ยังไม่ตรวจฐานข้อมูล
 """
 
 import secrets
@@ -56,11 +60,14 @@ def healthz():
 
 @app.post("/api/links", status_code=201)
 def create_link(data: LinkIn, request: Request):
+    """รับ URL ยาว แล้วคืนรหัสและลิงก์สั้น"""
+    # ฟีเจอร์ของ lab บทที่ 1: ยอมรับเฉพาะ URL ที่ขึ้นต้นด้วย http:// หรือ https://
     if not data.url.startswith(("http://", "https://")):
-    raise HTTPException(
-        status_code=422,
-        detail="URL ต้องขึ้นต้นด้วย http:// หรือ https://"
-    )
+        raise HTTPException(
+            status_code=422,
+            detail="URL ต้องขึ้นต้นด้วย http:// หรือ https://",
+        )
+
     code = new_code()
     created_at = datetime.now(timezone.utc).isoformat()
     with get_db() as conn:

@@ -1,3 +1,4 @@
 .venv/
 __pycache__/
 *.db
+# TODO (lab บทที่ 2): เพิ่ม .env
